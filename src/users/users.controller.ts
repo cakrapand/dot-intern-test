@@ -9,6 +9,7 @@ import { Public } from 'src/common/decorators/public.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post()
   async create(
     @Body(new ZodValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto,

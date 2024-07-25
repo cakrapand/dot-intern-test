@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { hashPassword } from 'src/helpers/password.helper';
 
 @Injectable()
 export class UsersService {
@@ -13,8 +18,23 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const newUser = this.usersRepository.create(createUserDto);
-    return await this.usersRepository.save(newUser);
+    if (await this.findOneByUsername(createUserDto.username))
+      throw new BadRequestException('Username used');
+
+    try {
+      const hashedPassword = await hashPassword(createUserDto.password);
+
+      const newUser = this.usersRepository.create({
+        name: createUserDto.name,
+        username: createUserDto.username,
+        password: hashedPassword,
+      });
+      if (!newUser)
+        throw new InternalServerErrorException('Failed create user');
+      return await this.usersRepository.save(newUser);
+    } catch (err) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async findAll() {

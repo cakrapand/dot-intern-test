@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
@@ -11,25 +11,32 @@ export class PostsService {
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
   ) {}
-  async create(createPostDto: CreatePostDto) {
-    const newPost = this.postsRepository.create(createPostDto);
+  async create(createPostDto: CreatePostDto, userId: number) {
+    const newPost = this.postsRepository.create({
+      ...createPostDto,
+      userId,
+    });
     return await this.postsRepository.save(newPost);
   }
 
-  async findAll() {
-    return await this.postsRepository.find();
+  async findAll(userId: number) {
+    return await this.postsRepository.find({ where: { userId: userId } });
   }
 
   async findOneById(id: number) {
     return await this.postsRepository.findOneBy({ id: id });
   }
 
-  async update(id: number, updatePostDto: UpdatePostDto) {
+  async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
+    const post = await this.findOneById(id);
+    if (post.userId != userId) throw new UnauthorizedException();
     await this.postsRepository.update(id, updatePostDto);
     return await this.findOneById(id);
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: number) {
+    const post = await this.findOneById(id);
+    if (post.userId != userId) throw new UnauthorizedException();
     await this.postsRepository.delete(id);
   }
 }
