@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
@@ -24,7 +28,9 @@ export class PostsService {
   }
 
   async findOneById(id: number) {
-    return await this.postsRepository.findOneBy({ id: id });
+    const post = await this.postsRepository.findOneBy({ id: id });
+    if (!post) throw new NotFoundException();
+    return post;
   }
 
   async update(id: number, updatePostDto: UpdatePostDto, userId: number) {
