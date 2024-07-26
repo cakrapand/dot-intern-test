@@ -15,10 +15,33 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('should return 401 for unauthenticated access to protected route', () => {
+    return request(app.getHttpServer()).get('/posts').expect(401);
+  });
+
+  it('should authenticate and return token', () => {
     return request(app.getHttpServer())
-      .get('/')
+      .post('/auth/login')
+      .send({ username: 'cakracakra', password: 'cakracakra' })
       .expect(200)
-      .expect('Hello World!');
+      .expect((res) => expect(res.body.data).toHaveProperty('token'));
+  });
+
+  it('should access protected route with valid token', async () => {
+    const loginResponse = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ username: 'cakracakra', password: 'cakracakra' })
+      .expect(200);
+
+    const token = loginResponse.body.data.token;
+
+    return request(app.getHttpServer())
+      .get('/posts')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
   });
 });

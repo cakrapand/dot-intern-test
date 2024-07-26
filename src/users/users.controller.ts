@@ -2,8 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, CreateUserSchema } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUserSchema } from './dto/update-user.dto';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
-import { Public } from 'src/common/decorators/public.decorator';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {

@@ -5,6 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { PostsModule } from './posts/posts.module';
 import { AuthModule } from './auth/auth.module';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { AuthGuard } from './common/guards/auth.guard';
+import { ResponseInterceptor } from './common/interceptors/reponse.interceptor';
+import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 
 @Module({
   imports: [
@@ -29,6 +33,20 @@ import { AuthModule } from './auth/auth.module';
     PostsModule,
     AuthModule,
     AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}

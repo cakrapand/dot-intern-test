@@ -12,7 +12,7 @@ import { PostsService } from './posts.service';
 import { CreatePostDto, createPostSchema } from './dto/create-post.dto';
 import { UpdatePostDto, updatePostSchema } from './dto/update-post.dto';
 import { Request } from 'express';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 
 @Controller('posts')
 export class PostsController {
