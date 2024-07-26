@@ -17,12 +17,6 @@ export class UsersController {
     return await this.usersService.create(createUserDto);
   }
 
-  @Public()
-  @Get()
-  async findAll() {
-    return await this.usersService.findAll();
-  }
-
   @Get(':id')
   async findOneById(@Param('id') id: number) {
     return await this.usersService.findOneById(id);
